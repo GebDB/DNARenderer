@@ -5,20 +5,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
 #include "TextRenderer.h"
-
 #include "HelixRenderer.h"
 
 #include "ResourceManager.h"
 
-#include <shader.h>
 #include <camera.h>
+
 
 #include <DNA.h>
 
@@ -85,9 +78,13 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+
     // OpenGL configuration
     // --------------------
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -97,16 +94,16 @@ int main()
     Text = new TextRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
     Text->Load("assets/fonts/AovelSansRounded-rdDL.ttf", 24);
 
-    std::string seq = "AACCGGTTGCTGGGTGAACTCCAGACTCGGGGCGACAACTC";
+    std::string seq = "ATCCGGTTGCTGGGTGAACTCCAGACTCGGGGCGACAACTC";
     dna.setSequence(seq);
 
 
     // Set up Helix Renderer
     ResourceManager::LoadShader("helix.vs", "helix.fs", nullptr, "helix");
     Helix = new HelixRenderer(seq, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
 
-
+    //Load model
+    Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
 
     // render loop
     // -----------
@@ -123,10 +120,13 @@ int main()
 
         // render
         // ------
-        glClearColor(0.0f, 1.0f, 0.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        Helix->RenderHelix(camera, DNALadder, seq);
+        // clear depth and render text in the forefront. 
+        glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText(seq, 5.0f, 5.0f, 1.0f);
-        Helix->RenderHelix(camera);
         // if (userUI clicked) { prompt file to load, change sequence }
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)

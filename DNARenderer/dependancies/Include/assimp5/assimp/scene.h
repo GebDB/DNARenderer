@@ -50,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #   pragma GCC system_header
 #endif
 
-#include <assimp/types.h>
-#include <assimp/texture.h>
-#include <assimp/mesh.h>
-#include <assimp/light.h>
-#include <assimp/camera.h>
-#include <assimp/material.h>
-#include <assimp/anim.h>
-#include <assimp/metadata.h>
+#include <assimp5/assimp/types.h>
+#include <assimp5/assimp/texture.h>
+#include <assimp5/assimp/mesh.h>
+#include <assimp5/assimp/light.h>
+#include <assimp5/assimp/camera.h>
+#include <assimp5/assimp/material.h>
+#include <assimp5/assimp/anim.h>
+#include <assimp5/assimp/metadata.h>
 
 #ifdef __cplusplus
 #  include <cstdlib>

@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include "camera.h"
+#include "model.h"
 
 
 class HelixRenderer
@@ -16,13 +17,11 @@ class HelixRenderer
 public:
     HelixRenderer(std::string& sequence, unsigned int width, unsigned int height);
     ~HelixRenderer();
-    void RenderHelix(Camera& camera);
+    void RenderHelix(Camera& camera, Model& DNALadder, string& seq);
     void DrawNucleotide(glm::vec3 position, glm::vec3 color, char nucleotide);
 private:
     unsigned int VAO, lightVAO, VBO, EBO, sequenceLength, SCRWIDTH, SCRHEIGHT;
-
     Shader HelixShader, LightShader;
-
 };
 #endif
 
