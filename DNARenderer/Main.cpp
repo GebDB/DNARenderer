@@ -14,7 +14,12 @@
 
 
 #include <DNA.h>
-
+/** CHECKLIST 
+- add customizable screen width and height
+- add customizable camera speed
+- add way for user to input DNA Sequence
+- add controls settings
+**/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -22,7 +27,7 @@ void processInput(GLFWwindow* window);
 
 // settings
 // The Width of the screen
-const unsigned int SCREEN_WIDTH = 800;
+const unsigned int SCREEN_WIDTH = 800; 
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 600;
 
@@ -90,7 +95,6 @@ int main()
 
 
     // Set up Text Renderer
-    ResourceManager::LoadShader("text.vs", "text.fs", nullptr, "text");
     Text = new TextRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
     Text->Load("assets/fonts/AovelSansRounded-rdDL.ttf", 24);
 
@@ -99,11 +103,11 @@ int main()
 
 
     // Set up Helix Renderer
-    ResourceManager::LoadShader("helix.vs", "helix.fs", nullptr, "helix");
     Helix = new HelixRenderer(seq, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     //Load model
     Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
+    Model backbone("assets/objects/PhosphateBackbone/backbone1.obj");
 
     // render loop
     // -----------
@@ -122,8 +126,8 @@ int main()
         // ------
         glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        Helix->RenderHelix(camera, DNALadder, backbone);
 
-        Helix->RenderHelix(camera, DNALadder, seq);
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText(seq, 5.0f, 5.0f, 1.0f);
