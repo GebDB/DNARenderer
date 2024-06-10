@@ -135,6 +135,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dependancies\Include\ImGUI\imgui.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_demo.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_tables.cpp" />
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="DNA.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="HelixRenderer.cpp" />
@@ -147,6 +154,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imconfig.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imgui.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imgui_impl_glfw.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imgui_impl_opengl3.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imgui_internal.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="dependancies\Include\ImGUI\imstb_truetype.h" />
     <ClInclude Include="dependancies\Include\stb_image.h" />
     <ClInclude Include="DNA.h" />
     <ClInclude Include="HelixRenderer.h" />

@@ -4,6 +4,10 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <ImGUI/imgui.h>
+#include <ImGUI/imgui_impl_glfw.h>
+#include <ImGUI/imgui_impl_opengl3.h>
+
 
 #include "TextRenderer.h"
 #include "HelixRenderer.h"
@@ -14,6 +18,7 @@
 
 
 #include <DNA.h>
+
 /** CHECKLIST 
 - add customizable screen width and height
 - add customizable camera speed
@@ -27,9 +32,13 @@ void processInput(GLFWwindow* window);
 
 // settings
 // The Width of the screen
-const unsigned int SCREEN_WIDTH = 800; 
+const unsigned int SCREEN_WIDTH = 1280; 
 // The height of the screen
-const unsigned int SCREEN_HEIGHT = 600;
+const unsigned int SCREEN_HEIGHT = 720;
+// Tab toggle
+bool tabToggled = false;
+// Input Size
+const unsigned int inputSize = 80000000;
 
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -109,6 +118,14 @@ int main()
     Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
     Model backbone("assets/objects/PhosphateBackbone/backbone1.obj");
 
+    // ImGUI initialization
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -126,18 +143,51 @@ int main()
         // ------
         glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         Helix->RenderHelix(camera, DNALadder, backbone);
 
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
-        Text->RenderText(seq, 5.0f, 5.0f, 1.0f);
-        // if (userUI clicked) { prompt file to load, change sequence }
+        Text->RenderText("Sequence: " + seq, 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
+  
+        // All ImGUI implementation here
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Settings"))
+            {
+                if (ImGui::MenuItem("Controls")) {}
+                if (ImGui::MenuItem("Window")) {}
+                if (ImGui::MenuItem("Input Size")) {}
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Import DNA Sequence")) {}
+                if (ImGui::MenuItem("Save DNA Sequence")) {}
+                if (ImGui::MenuItem("Delete DNA Sequence")) {}
+                ImGui::EndMenu();
+            }
+            if (ImGui::Button("Reset")) {}
+            ImGui::Text("Sequence Input:");
+            static char buf[inputSize] = "";
+            ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
+
+            ImGui::EndMainMenuBar();
+        }
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
 
     // delete all resources as loaded using the resource manager
     // ---------------------------------------------------------
@@ -154,18 +204,23 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        tabToggled = true;
+    }
 
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !tabToggled)
         camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !tabToggled)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !tabToggled)
         camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !tabToggled)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !tabToggled)
         camera.ProcessKeyboard(MOVEUP, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && !tabToggled)
         camera.ProcessKeyboard(MOVEDOWN, deltaTime);
 }
 
@@ -185,7 +240,7 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
-    if (firstMouse)
+    if (firstMouse || tabToggled)
     {
         lastX = xpos;
         lastY = ypos;
