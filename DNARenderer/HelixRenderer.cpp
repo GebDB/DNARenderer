@@ -18,19 +18,18 @@
 #include "ResourceManager.h"
 
 
-HelixRenderer::HelixRenderer(std::string& seq, unsigned int width, unsigned int height) {
+HelixRenderer::HelixRenderer(unsigned int width, unsigned int height) {
     this->HelixShader = ResourceManager::LoadShader("helix.vs", "helix.fs", nullptr, "helix");
     this->LightShader = ResourceManager::LoadShader("light.vs", "light.fs", nullptr, "light");
 
     SCRHEIGHT = height;
     SCRWIDTH = width;
-    sequence = seq;
-    sequenceLength = sequence.length();
 
 }
 
 
-void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbone) { 
+void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, string sequence) { 
+    sequenceLength = sequence.length();
     int sequenceLength = sequence.length();
     this->HelixShader.Use();
 

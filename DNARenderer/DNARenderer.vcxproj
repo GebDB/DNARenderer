@@ -148,6 +148,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SettingsController.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="ResourceManager.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="SettingsController.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="texture.h" />

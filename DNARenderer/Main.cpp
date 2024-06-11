@@ -1,36 +1,36 @@
 #include <iostream>
-#include <map>
 #include <string>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <ImGUI/imgui.h>
 #include <ImGUI/imgui_impl_glfw.h>
 #include <ImGUI/imgui_impl_opengl3.h>
-
 
 #include "TextRenderer.h"
 #include "HelixRenderer.h"
 
 #include "ResourceManager.h"
+#include "SettingsController.h"
 
 #include <camera.h>
-
 
 #include <DNA.h>
 
 /** CHECKLIST 
 - add customizable screen width and height
 - add customizable camera speed
-- add way for user to input DNA Sequence
+- add way for user to input DNA Sequence, editable input size
 - add controls settings
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 
-// settings
+// Settings
 // The Width of the screen
 const unsigned int SCREEN_WIDTH = 1280; 
 // The height of the screen
@@ -54,6 +54,8 @@ float lastFrame = 0.0f;
 DNA dna;
 TextRenderer* Text;
 HelixRenderer* Helix;
+
+
 
 int main()
 {
@@ -81,6 +83,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     // tell GLFW to capture our mouse
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -92,7 +95,6 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
-
 
     // OpenGL configuration
     // --------------------
@@ -112,7 +114,7 @@ int main()
 
 
     // Set up Helix Renderer
-    Helix = new HelixRenderer(seq, SCREEN_WIDTH, SCREEN_HEIGHT);
+    Helix = new HelixRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     //Load model
     Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
@@ -125,6 +127,8 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
+    // Set up controllers
+    SettingsController settings;
 
     // render loop
     // -----------
@@ -148,20 +152,23 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        Helix->RenderHelix(camera, DNALadder, backbone);
+        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence());
 
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
-        Text->RenderText("Sequence: " + seq, 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
-  
+        Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
+        if (!tabToggled)
+        {
+            Text->RenderText("Press tab to show cursor", 7.0f, 25.0f, .95f);
+        }
         // All ImGUI implementation here
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("Settings"))
             {
-                if (ImGui::MenuItem("Controls")) {}
-                if (ImGui::MenuItem("Window")) {}
-                if (ImGui::MenuItem("Input Size")) {}
+                if (ImGui::MenuItem("Controls")) { settings.setControlsSettingsActive(true); }
+                if (ImGui::MenuItem("Window")) { settings.setWindowSettingsActive(true); }
+                if (ImGui::MenuItem("Input Size")) { settings.setInputSizeSettingsActive(true); }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
@@ -171,13 +178,28 @@ int main()
                 if (ImGui::MenuItem("Delete DNA Sequence")) {}
                 ImGui::EndMenu();
             }
-            if (ImGui::Button("Reset")) {}
-            ImGui::Text("Sequence Input:");
             static char buf[inputSize] = "";
+            if (ImGui::Button("Reset")) {
+                dna.setSequence("");
+            }
+            ImGui::Text("Sequence Input:");
             ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
+            if (ImGui::Button("Set Sequence")) {
+                dna.setSequence(buf);
+            }
 
             ImGui::EndMainMenuBar();
         }
+        if (settings.getControlsSettingsActive()) {
+            settings.controlsEvent();
+        }
+        if (settings.getWindowSettingsActive()) {
+            settings.windowEvent();
+        }
+        if (settings.getInputSizeSettingsActive()) {
+            settings.inputSizeEvent();
+        }
+        // implement 2 sliders for movement speed and camera zoom.
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -204,10 +226,8 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_TAB) == GLFW_PRESS) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        tabToggled = true;
-    }
+
+
 
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !tabToggled)
@@ -255,6 +275,24 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+    {
+        switch (tabToggled) {
+        case true:
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            tabToggled = false;
+            break;
+        case false:
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            tabToggled = true;
+            break;
+        }
+
+    }
+}
+
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------

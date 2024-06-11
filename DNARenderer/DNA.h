@@ -11,7 +11,7 @@ public:
 	DNA();
 	void setHelixLength(double value);
 	double getHelixLength() const;
-	void setSequence(std::string& sequenceIn);
+	void setSequence(std::string sequenceIn);
 	std::string getSequence() const;
 	//load dna sequence method
 };

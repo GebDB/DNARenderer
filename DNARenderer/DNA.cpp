@@ -10,7 +10,7 @@ void DNA::setHelixLength(double value) {
 double DNA::getHelixLength() const {
 	return helixLength;
 }
-void DNA::setSequence(std::string& sequenceIn) {
+void DNA::setSequence(std::string sequenceIn) {
 	sequence = sequenceIn;
 }
 std::string DNA::getSequence() const{
