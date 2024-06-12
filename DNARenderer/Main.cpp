@@ -26,7 +26,7 @@
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 
@@ -35,8 +35,8 @@ void processInput(GLFWwindow* window);
 const unsigned int SCREEN_WIDTH = 1280; 
 // The height of the screen
 const unsigned int SCREEN_HEIGHT = 720;
-// Tab toggle
-bool tabToggled = false;
+// left control toggle
+bool ctrlToggled = false;
 // Input Size
 const unsigned int inputSize = 80000000;
 
@@ -45,6 +45,7 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
+float scale = 1.0;
 
 // timing
 float deltaTime = 0.0f;
@@ -82,7 +83,7 @@ int main()
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
+    //glfwSetScrollCallback(window, scroll_callback);
     glfwSetKeyCallback(window, key_callback);
 
     // tell GLFW to capture our mouse
@@ -132,9 +133,9 @@ int main()
 
     // render loop
     // -----------
+
     while (!glfwWindowShouldClose(window))
     {
-
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -145,23 +146,21 @@ int main()
 
         // render
         // ------
-        glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+        glClearColor(0.165, 0.165, 0.2, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence());
+        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1/scale);
 
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
-        if (!tabToggled)
-        {
-            Text->RenderText("Press tab to show cursor", 7.0f, 25.0f, .95f);
-        }
+
         // All ImGUI implementation here
+        // Main Menu Bar implementation
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("Settings"))
@@ -199,7 +198,22 @@ int main()
         if (settings.getInputSizeSettingsActive()) {
             settings.inputSizeEvent();
         }
-        // implement 2 sliders for movement speed and camera zoom.
+        // 2 sliders for movement speed and camera zoom.
+        if (ImGui::Begin("Scale and Movement Speed")) {
+            ImGui::SetWindowSize(ImVec2(355, 78)); 
+            ImGui::SetWindowPos(ImVec2(10, 28));
+            if (ImGui::SliderFloat("Scale", &scale, 0.25f, 10.0f)) {}
+            if (ImGui::SliderFloat("Movement Speed", &camera.MovementSpeed, 0.5f, 500.0f)) {}
+            if (!ctrlToggled)
+            {
+                    ImGui::SetWindowSize(ImVec2(355, 94));
+                    ImGui::Text("Press left-ctrl to show cursor");
+
+            }
+            ImGui::End();
+        }
+
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -226,21 +240,17 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-
-
-
-
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !tabToggled)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && !ctrlToggled)
         camera.ProcessKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !tabToggled)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !ctrlToggled)
         camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !tabToggled)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && !ctrlToggled)
         camera.ProcessKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !tabToggled)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && !ctrlToggled)
         camera.ProcessKeyboard(RIGHT, deltaTime);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !tabToggled)
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !ctrlToggled)
         camera.ProcessKeyboard(MOVEUP, deltaTime);
-    if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && !tabToggled)
+    if ((glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) && !ctrlToggled)
         camera.ProcessKeyboard(MOVEDOWN, deltaTime);
 }
 
@@ -258,35 +268,40 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // -------------------------------------------------------
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-    if (firstMouse || tabToggled)
-    {
+    if (!ctrlToggled) {
+        float xpos = static_cast<float>(xposIn);
+        float ypos = static_cast<float>(yposIn);
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
         lastX = xpos;
         lastY = ypos;
-        firstMouse = false;
+
+        camera.ProcessMouseMovement(xoffset, yoffset);
     }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
+    else {
+        firstMouse = true;
+    }
 }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+    if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
     {
-        switch (tabToggled) {
+        switch (ctrlToggled) {
         case true:
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-            tabToggled = false;
+            ctrlToggled = false;
             break;
         case false:
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            tabToggled = true;
+            ctrlToggled = true;
             break;
         }
 
@@ -296,7 +311,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 // glfw: whenever the mouse scroll wheel scrolls, this callback is called
 // ----------------------------------------------------------------------
+/* Not needed as zooming will be handled by scaling in the ui.
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(static_cast<float>(yoffset));
-}
+}*/

@@ -108,6 +108,7 @@ public:
     }
 
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
+    /* Disabled as we are using the scroll wheel to rescale the helix renderer, which is effectively the same as zooming in and out.
     void ProcessMouseScroll(float yoffset)
     {
         Zoom -= (float)yoffset;
@@ -116,7 +117,7 @@ public:
         if (Zoom > 45.0f)
             Zoom = 45.0f;
     }
-
+    */
 private:
     // calculates the front vector from the Camera's (updated) Euler Angles
     void updateCameraVectors()

@@ -17,7 +17,7 @@ class HelixRenderer
 public:
     HelixRenderer(unsigned int width, unsigned int height);
     ~HelixRenderer();
-    void RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, std::string sequence);
+    void RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, std::string sequence, float scale);
 private:
     unsigned int VAO, lightVAO, VBO, EBO, sequenceLength, SCRWIDTH, SCRHEIGHT;
     Shader HelixShader, LightShader, BackboneShader;
