@@ -7,6 +7,7 @@
 #include <ImGUI/imgui.h>
 #include <ImGUI/imgui_impl_glfw.h>
 #include <ImGUI/imgui_impl_opengl3.h>
+#include <ImGUI/imgui_stdlib.h>
 
 #include "TextRenderer.h"
 #include "HelixRenderer.h"
@@ -19,10 +20,8 @@
 #include <DNA.h>
 
 /** CHECKLIST 
-- add customizable screen width and height
-- add customizable camera speed
-- add way for user to input DNA Sequence, editable input size
 - add controls settings
+- set sequence button is cut off screen when window settings is a smalller number, fix?
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -31,17 +30,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void processInput(GLFWwindow* window);
 
 // Settings
-// The Width of the screen
-const unsigned int SCREEN_WIDTH = 1280; 
-// The height of the screen
-const unsigned int SCREEN_HEIGHT = 720;
+SettingsController settings;
+unsigned int SCREEN_WIDTH = settings.getWindowSettings().at(0);
+unsigned int SCREEN_HEIGHT = settings.getWindowSettings().at(1);
 // left control toggle
 bool ctrlToggled = false;
-// Input Size
-const unsigned int inputSize = 80000000;
 
 // camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 20.0f, 60.0f));
 float lastX = SCREEN_WIDTH / 2.0f;
 float lastY = SCREEN_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -66,6 +62,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -128,12 +125,10 @@ int main()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
-    // Set up controllers
-    SettingsController settings;
 
     // render loop
     // -----------
-
+    std::string sequenceInput = "";
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -148,26 +143,23 @@ int main()
         // ------
         glClearColor(0.165, 0.165, 0.2, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1/scale);
-
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
 
-        // All ImGUI implementation here
-        // Main Menu Bar implementation
+        // -------------- All ImGUI implementation here ----------------//
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        //  Main Menu Bar implementation 
         if (ImGui::BeginMainMenuBar())
         {
             if (ImGui::BeginMenu("Settings"))
             {
                 if (ImGui::MenuItem("Controls")) { settings.setControlsSettingsActive(true); }
                 if (ImGui::MenuItem("Window")) { settings.setWindowSettingsActive(true); }
-                if (ImGui::MenuItem("Input Size")) { settings.setInputSizeSettingsActive(true); }
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
@@ -177,14 +169,13 @@ int main()
                 if (ImGui::MenuItem("Delete DNA Sequence")) {}
                 ImGui::EndMenu();
             }
-            static char buf[inputSize] = "";
             if (ImGui::Button("Reset")) {
                 dna.setSequence("");
             }
             ImGui::Text("Sequence Input:");
-            ImGui::InputText("", buf, IM_ARRAYSIZE(buf));
+            ImGui::InputText("", &sequenceInput);
             if (ImGui::Button("Set Sequence")) {
-                dna.setSequence(buf);
+                dna.setSequence(sequenceInput);
             }
 
             ImGui::EndMainMenuBar();
@@ -193,11 +184,9 @@ int main()
             settings.controlsEvent();
         }
         if (settings.getWindowSettingsActive()) {
-            settings.windowEvent();
+            settings.windowEvent(window);
         }
-        if (settings.getInputSizeSettingsActive()) {
-            settings.inputSizeEvent();
-        }
+
         // 2 sliders for movement speed and camera zoom.
         if (ImGui::Begin("Scale and Movement Speed")) {
             ImGui::SetWindowSize(ImVec2(355, 78)); 
@@ -210,10 +199,9 @@ int main()
                     ImGui::Text("Press left-ctrl to show cursor");
 
             }
-            ImGui::End();
+
         }
-
-
+        ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -223,12 +211,13 @@ int main()
         glfwPollEvents();
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
+
 
     // delete all resources as loaded using the resource manager
     // ---------------------------------------------------------
     ResourceManager::Clear();
 
+    ImGui_ImplOpenGL3_Shutdown();
     glfwTerminate();
     return 0;
 }

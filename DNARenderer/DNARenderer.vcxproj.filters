@@ -75,6 +75,9 @@
     <ClCompile Include="SettingsController.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dependancies\Include\ImGUI\imgui_stdlib.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader.h">
@@ -137,6 +140,9 @@
     <ClInclude Include="SettingsController.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dependancies\Include\ImGUI\imgui_stdlib.h">
+      <Filter>Header Files\ImGUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="text.vs">
@@ -162,5 +168,10 @@
     <Font Include="assets\fonts\AovelSansRounded-rdDL.ttf">
       <Filter>Resource Files</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="window.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

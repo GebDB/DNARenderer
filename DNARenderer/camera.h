@@ -108,7 +108,7 @@ public:
     }
 
     // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-    /* Disabled as we are using the scroll wheel to rescale the helix renderer, which is effectively the same as zooming in and out.
+    /* Disabled as we are using a button to rescale our helix, which is effectively the same as zooming in and out.
     void ProcessMouseScroll(float yoffset)
     {
         Zoom -= (float)yoffset;
