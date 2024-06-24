@@ -14,6 +14,7 @@
 
 #include "ResourceManager.h"
 #include "SettingsController.h"
+#include "FileController.h"
 
 #include <camera.h>
 
@@ -22,6 +23,7 @@
 /** CHECKLIST 
 - add controls settings
 - set sequence button is cut off screen when window settings is a smalller number, fix?
+- add reset view button by sliders
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -30,9 +32,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void processInput(GLFWwindow* window);
 
 // Settings
-SettingsController settings;
-unsigned int SCREEN_WIDTH = settings.getWindowSettings().at(0);
-unsigned int SCREEN_HEIGHT = settings.getWindowSettings().at(1);
+SettingsController settingsController;
+FileController fileController;
+unsigned int SCREEN_WIDTH = settingsController.getWindowSettings().at(0);
+unsigned int SCREEN_HEIGHT = settingsController.getWindowSettings().at(1);
 // left control toggle
 bool ctrlToggled = false;
 
@@ -158,17 +161,11 @@ int main()
         {
             if (ImGui::BeginMenu("Settings"))
             {
-                if (ImGui::MenuItem("Controls")) { settings.setControlsSettingsActive(true); }
-                if (ImGui::MenuItem("Window")) { settings.setWindowSettingsActive(true); }
+                if (ImGui::MenuItem("Controls")) { settingsController.setControlsSettingsActive(true); } // State of ui is set to true, which opens it.
+                if (ImGui::MenuItem("Window")) { settingsController.setWindowSettingsActive(true); }
                 ImGui::EndMenu();
             }
-            if (ImGui::BeginMenu("File"))
-            {
-                if (ImGui::MenuItem("Import DNA Sequence")) {}
-                if (ImGui::MenuItem("Save DNA Sequence")) {}
-                if (ImGui::MenuItem("Delete DNA Sequence")) {}
-                ImGui::EndMenu();
-            }
+            fileController.menuEvent(); // file menu items
             if (ImGui::Button("Reset")) {
                 dna.setSequence("");
             }
@@ -180,11 +177,12 @@ int main()
 
             ImGui::EndMainMenuBar();
         }
-        if (settings.getControlsSettingsActive()) {
-            settings.controlsEvent();
+
+        if (settingsController.getControlsSettingsActive()) { // if state of settings event is true, call the ui event and display it.
+            settingsController.controlsEvent();
         }
-        if (settings.getWindowSettingsActive()) {
-            settings.windowEvent(window);
+        if (settingsController.getWindowSettingsActive()) {
+            settingsController.windowEvent(window);
         }
 
         // 2 sliders for movement speed and camera zoom.

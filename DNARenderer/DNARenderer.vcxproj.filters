@@ -78,6 +78,12 @@
     <ClCompile Include="dependancies\Include\ImGUI\imgui_stdlib.cpp">
       <Filter>Source Files\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="FileController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dependancies\Include\ImGuiFileDialog\ImGuiFileDialog.cpp">
+      <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shader.h">
@@ -141,6 +147,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dependancies\Include\ImGUI\imgui_stdlib.h">
+      <Filter>Header Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="FileController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dependancies\Include\ImGuiFileDialog\ImGuiFileDialog.h">
+      <Filter>Header Files\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="dependancies\Include\ImGuiFileDialog\ImGuiFileDialogConfig.h">
       <Filter>Header Files\ImGUI</Filter>
     </ClInclude>
   </ItemGroup>

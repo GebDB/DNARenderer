@@ -127,9 +127,9 @@ void SettingsController::windowLoadSettings() {
 
 
 
-//--------------------- Helper Methods used for state management of settings ui----------------------//
+//--------------------- Helper Methods used for state management of ui ----------------------//
 void SettingsController::setControlsSettingsActive(bool active) { controlsSettingsActive = active; }
 void SettingsController::setWindowSettingsActive(bool active) { windowSettingsActive = active; }
 bool SettingsController::getControlsSettingsActive() { return controlsSettingsActive; }
 bool SettingsController::getWindowSettingsActive() { return windowSettingsActive; }
-std::vector<int> SettingsController::getWindowSettings() { return windowSettings; }
+std::vector<int> SettingsController::getWindowSettings() { return windowSettings; } // returns the resolution of the window in a vector size of 2.
