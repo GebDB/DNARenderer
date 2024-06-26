@@ -1,27 +1,11 @@
-
-#include <iostream>
-
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <ft2build.h>
-#include FT_FREETYPE_H
-
-#include "camera.h"
-#include <model.h>
-
 #include "HelixRenderer.h"
-#include "ResourceManager.h"
+
 
 
 HelixRenderer::HelixRenderer(unsigned int width, unsigned int height) {
     this->HelixShader = ResourceManager::LoadShader("helix.vs", "helix.fs", nullptr, "helix");
     this->LightShader = ResourceManager::LoadShader("light.vs", "light.fs", nullptr, "light");
-
+    invalidInput = false;
     SCRHEIGHT = height;
     SCRWIDTH = width;
 
@@ -39,6 +23,7 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
     this->HelixShader.SetMatrix4("projection", projection);
     this->HelixShader.SetMatrix4("view", view);
 
+    invalidInput = false;
     for (int i = 0; i < sequenceLength; i++) {
         // render the loaded model
         glm::mat4 model = glm::mat4(1.0f); // model used for base pairs
@@ -72,7 +57,11 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
             this->HelixShader.SetInteger("invertColor", 1);
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             break;
-
+        default:
+            invalidInput = true;
+        }
+        if (invalidInput) {
+            break;
         }
         this->HelixShader.SetMatrix4("model", model);
         DNALadder.Draw(this->HelixShader);
@@ -85,5 +74,8 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
         this->HelixShader.SetMatrix4("model", leftBackbone);
         backbone.Draw(this->HelixShader);
     }
+}
 
+bool HelixRenderer::isInvalidInput() {
+    return invalidInput;
 }

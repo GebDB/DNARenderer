@@ -22,8 +22,11 @@
 
 /** CHECKLIST 
 - add controls settings
-- set sequence button is cut off screen when window settings is a smalller number, fix?
+- "set sequence button" is cut off screen when window settings is a smalller number, fix? Make inputText shorter in width. Add clear button?
 - add reset view button by sliders
+- add rotation with mouse scroll wheel?
+- add save and delete feature.
+- add full screen window setting
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -142,20 +145,20 @@ int main()
         // -----
         processInput(window);
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         // render
         // ------
         glClearColor(0.165, 0.165, 0.2, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1/scale);
+        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1 / scale);
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
 
         // -------------- All ImGUI implementation here ----------------//
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
         //  Main Menu Bar implementation 
         if (ImGui::BeginMainMenuBar())
         {
@@ -165,7 +168,7 @@ int main()
                 if (ImGui::MenuItem("Window")) { settingsController.setWindowSettingsActive(true); }
                 ImGui::EndMenu();
             }
-            fileController.menuEvent(); // file menu items
+            fileController.menuEvent(dna); // file menu items
             if (ImGui::Button("Reset")) {
                 dna.setSequence("");
             }
@@ -174,7 +177,6 @@ int main()
             if (ImGui::Button("Set Sequence")) {
                 dna.setSequence(sequenceInput);
             }
-
             ImGui::EndMainMenuBar();
         }
 
@@ -195,11 +197,29 @@ int main()
             {
                     ImGui::SetWindowSize(ImVec2(355, 94));
                     ImGui::Text("Press left-ctrl to show cursor");
-
             }
 
         }
         ImGui::End();
+
+        // Error messages
+        if (Helix->isInvalidInput()) {
+            if (ImGui::Begin("ERROR")) {
+                ImGui::SetWindowSize(ImVec2(110, 50));
+                ImGui::SetWindowPos(ImVec2(10, 116));
+                ImGui::Text("INVALID INPUT");
+            }
+            ImGui::End();
+        }
+        if (fileController.hasImportFailed()) {
+            if (ImGui::Begin("ERROR")) {
+                ImGui::SetWindowSize(ImVec2(110, 50));
+                ImGui::SetWindowPos(ImVec2(10, 116));
+                ImGui::Text("IMPORT FAILED");
+            }
+            ImGui::End();
+        }
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
