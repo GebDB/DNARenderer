@@ -25,7 +25,6 @@
 - "set sequence button" is cut off screen when window settings is a smalller number, fix? Make inputText shorter in width. Add clear button?
 - add reset view button by sliders
 - add rotation with mouse scroll wheel?
-- add save and delete feature.
 - add full screen window setting
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);

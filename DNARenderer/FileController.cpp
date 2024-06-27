@@ -12,16 +12,16 @@ void FileController::menuEvent(DNA& dna) {
 
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Delete")) {
-            createDialogInstance(".txt");
             deleteSelected = true;
+            createDialogInstance(".txt");
         }
         if (ImGui::MenuItem("Save")) {
-            createDialogInstance(".txt");
             saveSelected = true;
+            createDialogInstance(".txt");
         }
         if (ImGui::MenuItem("Import")) {
-            createDialogInstance(".txt");
             importSelected = true;
+            createDialogInstance(".txt");
         }
         ImGui::EndMenu();
     }
@@ -33,7 +33,6 @@ void FileController::menuEvent(DNA& dna) {
             std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
             std::string filter = ImGuiFileDialog::Instance()->GetCurrentFilter();
 
-            // here convert from string because a string was passed as a userDatas, but it can be what you want
             std::string userDatas;
 
             if (ImGuiFileDialog::Instance()->GetUserDatas())
@@ -43,10 +42,10 @@ void FileController::menuEvent(DNA& dna) {
 
             // action
             if (deleteSelected) {
-
+                deleteFile(filePathName.c_str());
             }
             else if (saveSelected) {
-
+                saveFile(dna,filePathName.c_str());
             }
             else if (importSelected) {
                 dna.setSequence(importSequence(dna, filePathName));
@@ -63,7 +62,15 @@ void FileController::menuEvent(DNA& dna) {
 void FileController::createDialogInstance(const char* fileExtension) {
     config.path = ".";
     config.flags = ImGuiFileDialogFlags_Modal;
-    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", fileExtension, config);
+    if (!saveSelected) {
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose a File", fileExtension, config);
+
+    }
+    else {
+        config.userDatas = IGFDUserDatas("SaveFile");
+        ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Save a File", fileExtension, config);
+    }
+
 }
 
 std::string FileController::importSequence(DNA& dna, std::string& filePath) {
@@ -81,6 +88,17 @@ std::string FileController::importSequence(DNA& dna, std::string& filePath) {
     inputFile.close();
 
     return line;
+}
+
+void FileController::deleteFile(const char* filePath) {
+    std::remove(filePath);
+}
+
+void FileController::saveFile(DNA& dna, const char* filePath) {
+    std::ofstream file(filePath);
+    std::string sequence = dna.getSequence();
+    file.write(sequence.c_str(), sequence.size());
+    file.close();
 }
 
 bool FileController::hasImportFailed() { return importFailed; }

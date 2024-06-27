@@ -24,6 +24,8 @@ public:
 	void menuEvent(DNA& dna);
 	void createDialogInstance(const char* fileExtension);
 	std::string importSequence(DNA& dna, std::string& filePath);
+	void deleteFile(const char* filePath);
+	void saveFile(DNA& dna, const char* filePath);
 	bool hasImportFailed();
 };
 
