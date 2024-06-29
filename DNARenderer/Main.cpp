@@ -23,8 +23,6 @@
 /** CHECKLIST 
 - add controls settings
 - "set sequence button" is cut off screen when window settings is a smalller number, fix? Make inputText shorter in width. Add clear button?
-- add reset view button by sliders
-- add rotation with mouse scroll wheel?
 - add full screen window setting
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -52,15 +50,20 @@ float scale = 1.0;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-// The DNA sequence that will be displayed in the application.
-DNA dna;
-TextRenderer* Text;
-HelixRenderer* Helix;
+
 
 
 
 int main()
 {
+    // The DNA sequence that will be displayed in the application.
+    DNA dna;
+    TextRenderer* Text;
+    HelixRenderer* Helix;
+
+    // rotation toggle
+    bool rotationToggled = false;
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -119,7 +122,7 @@ int main()
     // Set up Helix Renderer
     Helix = new HelixRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    //Load model
+    // Load model
     Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
     Model backbone("assets/objects/PhosphateBackbone/backbone1.obj");
 
@@ -152,7 +155,7 @@ int main()
         // ------
         glClearColor(0.165, 0.165, 0.2, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1 / scale);
+        Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1 / scale, rotationToggled);
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
         Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
@@ -186,19 +189,21 @@ int main()
             settingsController.windowEvent(window);
         }
 
-        // 2 sliders for movement speed and camera zoom.
-        if (ImGui::Begin("Scale and Movement Speed")) {
-            ImGui::SetWindowSize(ImVec2(355, 78)); 
+        // 2 sliders for movement speed and camera zoom. checkbox for rotation, button to reset the view
+        if (ImGui::Begin("Additional Controls")) {
+            ImGui::SetWindowSize(ImVec2(355, 123)); 
             ImGui::SetWindowPos(ImVec2(10, 28));
             if (ImGui::SliderFloat("Scale", &scale, 0.25f, 10.0f)) {}
             if (ImGui::SliderFloat("Movement Speed", &camera.MovementSpeed, 0.5f, 500.0f)) {}
+            if (ImGui::Checkbox("Rotation", &rotationToggled)) {}
+            if (ImGui::Button("Reset View")) { camera = glm::vec3(0.0f, 20.0f, 60.0f); }
             if (!ctrlToggled)
             {
-                    ImGui::SetWindowSize(ImVec2(355, 94));
+                    ImGui::SetWindowSize(ImVec2(355, 138));
                     ImGui::Text("Press left-ctrl to show cursor");
             }
-
         }
+
         ImGui::End();
 
         // Error messages

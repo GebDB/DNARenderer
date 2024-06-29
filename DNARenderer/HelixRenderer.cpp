@@ -12,7 +12,7 @@ HelixRenderer::HelixRenderer(unsigned int width, unsigned int height) {
 }
 
 
-void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, string sequence, float scale) { 
+void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, string sequence, float scale, bool rotationToggled) { 
     sequenceLength = sequence.length();
     int sequenceLength = sequence.length();
     this->HelixShader.Use();
@@ -31,7 +31,9 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
         model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f )); // scale down
         float angle = 20.0f * i;
         model = glm::rotate(model, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));  // rotate each base pair to create a helix structure
-
+        if (rotationToggled) {
+            model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0, 1.0f, 0.0f));
+        }
         glm::mat4 rightBackbone = glm::scale(model, glm::vec3(1.003f, 0.575f, 1.0f)); // scale with base pairs.
         rightBackbone = glm::rotate(rightBackbone, glm::radians(151.1f), glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -63,6 +65,7 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
         if (invalidInput) {
             break;
         }
+
         this->HelixShader.SetMatrix4("model", model);
         DNALadder.Draw(this->HelixShader);
 

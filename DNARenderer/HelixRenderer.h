@@ -32,7 +32,7 @@ class HelixRenderer
 public:
     HelixRenderer(unsigned int width, unsigned int height);
     ~HelixRenderer();
-    void RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, std::string sequence, float scale);
+    void RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, std::string sequence, float scale, bool rotationToggled);
     bool isInvalidInput();
 private:
     unsigned int VAO, lightVAO, VBO, EBO, sequenceLength, SCRWIDTH, SCRHEIGHT;
