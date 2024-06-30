@@ -62,8 +62,8 @@ void SettingsController::windowEvent(GLFWwindow *window) {
     if (ImGui::Begin("Window Settings"))
     {
         ImGui::SetWindowSize(ImVec2(200, 135));
-        static int xSize = windowSettings.at(0);
-        static int ySize = windowSettings.at(1);
+        static int xSize = windowWidth;
+        static int ySize = windowHeight;
         if (ImGui::BeginTable("Window Size", 1))
         {
             ImGui::TableNextColumn(); ImGui::InputInt("X", &xSize);
@@ -91,8 +91,8 @@ void SettingsController::windowSaveSettings(int x, int y) {
     if (myfile.is_open()) {
         myfile << x << "," << y << std::endl;
         myfile.close();
-        windowSettings.at(0) = x;
-        windowSettings.at(1) = y;
+        windowWidth = x;
+        windowHeight = y;
     }
     else {
         std::cerr << "Error opening the file!" << std::endl;
@@ -106,8 +106,8 @@ void SettingsController::windowLoadSettings() {
     // Check if the file is successfully opened 
     if (!inputFile.is_open()) {
         std::cerr << "Error opening the file!" << std::endl;
-        windowSettings.at(0) = 1280;
-        windowSettings.at(1) = 720;
+        windowWidth = 1280;
+        windowHeight = 720;
         return;
     }
 
@@ -118,9 +118,13 @@ void SettingsController::windowLoadSettings() {
     std::stringstream ss (line);
     std::string item;
     int i = 0;
-    windowSettings.resize(2);
     while (getline(ss, item, ',')) {
-        windowSettings.at(i) = std::stoi(item);
+        if (i == 0) {
+            windowWidth = std::stoi(item);
+        }
+        else {
+            windowHeight = std::stoi(item);
+        }
         i++;
     }
 }
@@ -132,4 +136,7 @@ void SettingsController::setControlsSettingsActive(bool active) { controlsSettin
 void SettingsController::setWindowSettingsActive(bool active) { windowSettingsActive = active; }
 bool SettingsController::getControlsSettingsActive() { return controlsSettingsActive; }
 bool SettingsController::getWindowSettingsActive() { return windowSettingsActive; }
-std::vector<int> SettingsController::getWindowSettings() { return windowSettings; } // returns the resolution of the window in a vector size of 2.
+int SettingsController::getWindowWidth() { return windowWidth; }
+int SettingsController::getWindowHeight() { return windowHeight; }
+void SettingsController::setWindowWidth(int width) { windowWidth = width; }
+void SettingsController::setWindowHeight(int height) { windowHeight = height; }

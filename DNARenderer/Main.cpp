@@ -22,8 +22,6 @@
 
 /** CHECKLIST 
 - add controls settings
-- "set sequence button" is cut off screen when window settings is a smalller number, fix? Make inputText shorter in width. Add clear button?
-- add full screen window setting
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -33,16 +31,14 @@ void processInput(GLFWwindow* window);
 
 // Settings
 SettingsController settingsController;
-FileController fileController;
-unsigned int SCREEN_WIDTH = settingsController.getWindowSettings().at(0);
-unsigned int SCREEN_HEIGHT = settingsController.getWindowSettings().at(1);
+
 // left control toggle
 bool ctrlToggled = false;
 
 // camera
 Camera camera(glm::vec3(0.0f, 20.0f, 60.0f));
-float lastX = SCREEN_WIDTH / 2.0f;
-float lastY = SCREEN_HEIGHT / 2.0f;
+float lastX = settingsController.getWindowWidth() / 2.0f;
+float lastY = settingsController.getWindowHeight() / 2.0f;
 bool firstMouse = true;
 float scale = 1.0;
 
@@ -50,12 +46,10 @@ float scale = 1.0;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
-
-
-
-
 int main()
 {
+    FileController fileController;
+
     // The DNA sequence that will be displayed in the application.
     DNA dna;
     TextRenderer* Text;
@@ -78,13 +72,18 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "DNA Sim", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(settingsController.getWindowWidth(), settingsController.getWindowHeight(), "DNA Simulator", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
     }
+    GLFWimage images[1];
+    images[0].pixels = stbi_load("assets/icon/icon.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+    glfwSetWindowIcon(window, 1, images);
+    stbi_image_free(images[0].pixels);
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -104,7 +103,7 @@ int main()
 
     // OpenGL configuration
     // --------------------
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    glViewport(0, 0, settingsController.getWindowWidth(), settingsController.getWindowHeight());
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
@@ -112,7 +111,7 @@ int main()
 
 
     // Set up Text Renderer
-    Text = new TextRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Text = new TextRenderer(settingsController.getWindowWidth(), settingsController.getWindowHeight());
     Text->Load("assets/fonts/AovelSansRounded-rdDL.ttf", 24);
 
     std::string seq = "ATCCGGTTGCTGGGTGAACTCCAGACTCGGGGCGACAACTC";
@@ -120,7 +119,7 @@ int main()
 
 
     // Set up Helix Renderer
-    Helix = new HelixRenderer(SCREEN_WIDTH, SCREEN_HEIGHT);
+    Helix = new HelixRenderer(settingsController.getWindowWidth(), settingsController.getWindowHeight());
 
     // Load model
     Model DNALadder("assets/objects/DNALadder/DNApair1.obj");
@@ -158,7 +157,7 @@ int main()
         Helix->RenderHelix(camera, DNALadder, backbone, dna.getSequence(), 1 / scale, rotationToggled);
         // clear depth and render text in the forefront. 
         glClear(GL_DEPTH_BUFFER_BIT);
-        Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, SCREEN_HEIGHT - 30.0f, 1.0f);
+        Text->RenderText("Sequence: " + dna.getSequence(), 15.0f, settingsController.getWindowHeight() - 30.0f, 1.0f);
 
         // -------------- All ImGUI implementation here ----------------//
         //  Main Menu Bar implementation 
@@ -167,10 +166,11 @@ int main()
             if (ImGui::BeginMenu("Settings"))
             {
                 if (ImGui::MenuItem("Controls")) { settingsController.setControlsSettingsActive(true); } // State of ui is set to true, which opens it.
-                if (ImGui::MenuItem("Window")) { settingsController.setWindowSettingsActive(true); }
+                if (ImGui::MenuItem("Window")) { settingsController.setWindowSettingsActive(true);}
                 ImGui::EndMenu();
             }
             fileController.menuEvent(dna); // file menu items
+            
             if (ImGui::Button("Reset")) {
                 dna.setSequence("");
             }
@@ -187,6 +187,8 @@ int main()
         }
         if (settingsController.getWindowSettingsActive()) {
             settingsController.windowEvent(window);
+            Text->AdjustProjection(settingsController.getWindowWidth(), settingsController.getWindowHeight());
+            Helix->AdjustProjection(settingsController.getWindowWidth(), settingsController.getWindowHeight());
         }
 
         // 2 sliders for movement speed and camera zoom. checkbox for rotation, button to reset the view
@@ -199,7 +201,7 @@ int main()
             if (ImGui::Button("Reset View")) { camera = glm::vec3(0.0f, 20.0f, 60.0f); }
             if (!ctrlToggled)
             {
-                    ImGui::SetWindowSize(ImVec2(355, 138));
+                    ImGui::SetWindowSize(ImVec2(355, 140));
                     ImGui::Text("Press left-ctrl to show cursor");
             }
         }

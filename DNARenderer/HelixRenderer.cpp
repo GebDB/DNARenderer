@@ -8,7 +8,6 @@ HelixRenderer::HelixRenderer(unsigned int width, unsigned int height) {
     invalidInput = false;
     SCRHEIGHT = height;
     SCRWIDTH = width;
-
 }
 
 
@@ -81,4 +80,8 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
 
 bool HelixRenderer::isInvalidInput() {
     return invalidInput;
+}
+void HelixRenderer::AdjustProjection(int width, int height) {
+    SCRHEIGHT = height;
+    SCRWIDTH = width;
 }

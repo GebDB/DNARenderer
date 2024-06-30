@@ -34,6 +34,7 @@ public:
     ~HelixRenderer();
     void RenderHelix(Camera& camera, Model& DNALadder, Model& backbone, std::string sequence, float scale, bool rotationToggled);
     bool isInvalidInput();
+    void AdjustProjection(int width, int height);
 private:
     unsigned int VAO, lightVAO, VBO, EBO, sequenceLength, SCRWIDTH, SCRHEIGHT;
     Shader HelixShader, LightShader, BackboneShader;

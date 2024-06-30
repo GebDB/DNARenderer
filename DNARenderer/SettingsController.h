@@ -10,14 +10,14 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
 
 class SettingsController {
 private:
 	bool controlsSettingsActive,
 		 windowSettingsActive;
 	std::ofstream myfile;
-	std::vector<int> windowSettings;
+	int windowWidth;
+	int windowHeight;
 
 public:
 	SettingsController();
@@ -33,7 +33,10 @@ public:
 	void windowSaveSettings(int x, int y);
 	void windowLoadSettings();
 
-	std::vector<int> getWindowSettings();
+	int getWindowWidth();
+	int getWindowHeight();
+	void setWindowHeight(int height);
+	void setWindowWidth(int width);
 };
 
 #endif
