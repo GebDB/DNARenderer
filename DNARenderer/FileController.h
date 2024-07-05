@@ -19,13 +19,13 @@ private:
 	bool saveSelected;
 	bool importSelected;
 	bool importFailed;
-public:
-	FileController();
-	void menuEvent(DNA& dna);
 	void createDialogInstance(const char* fileExtension);
 	std::string importSequence(DNA& dna, std::string& filePath);
 	void deleteFile(const char* filePath);
 	void saveFile(DNA& dna, const char* filePath);
+public:
+	FileController();
+	void menuEvent(DNA& dna);
 	bool hasImportFailed();
 };
 

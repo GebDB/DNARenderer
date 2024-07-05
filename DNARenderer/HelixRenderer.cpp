@@ -42,20 +42,20 @@ void HelixRenderer::RenderHelix(Camera& camera, Model& DNALadder, Model& backbon
         switch (sequence.at(i)) {
         case 'a':
         case 'A':
-            this->HelixShader.SetInteger("invertColor", 0);
+            this->HelixShader.SetInteger("invertColor", 0); // A: orange
             break;
         case 't':
         case 'T':
-            this->HelixShader.SetInteger("invertColor", 0);
+            this->HelixShader.SetInteger("invertColor", 0); // T: pink
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             break;
         case 'c':
         case 'C':
-            this->HelixShader.SetInteger("invertColor", 1);
+            this->HelixShader.SetInteger("invertColor", 1); // C: green
             break;
         case 'g':
         case 'G':
-            this->HelixShader.SetInteger("invertColor", 1);
+            this->HelixShader.SetInteger("invertColor", 1); // G: blue
             model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             break;
         default:

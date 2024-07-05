@@ -13,7 +13,6 @@ public:
 	double getHelixLength() const;
 	void setSequence(std::string sequenceIn);
 	std::string getSequence() const;
-	//load dna sequence method
 };
 
 #endif

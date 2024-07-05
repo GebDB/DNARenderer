@@ -18,6 +18,8 @@ private:
 	std::ofstream myfile;
 	int windowWidth;
 	int windowHeight;
+	void windowLoadSettings();
+	void windowSaveSettings(int x, int y);
 
 public:
 	SettingsController();
@@ -29,9 +31,6 @@ public:
 
 	void setControlsSettingsActive(bool active);
 	void setWindowSettingsActive(bool active);
-
-	void windowSaveSettings(int x, int y);
-	void windowLoadSettings();
 
 	int getWindowWidth();
 	int getWindowHeight();

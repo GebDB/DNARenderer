@@ -22,6 +22,7 @@
 
 /** CHECKLIST 
 - add controls settings
+- add color key for each nucleotide
 **/
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
