@@ -213,7 +213,7 @@ int main()
         if (Helix->isInvalidInput()) {
             if (ImGui::Begin("ERROR")) {
                 ImGui::SetWindowSize(ImVec2(110, 50));
-                ImGui::SetWindowPos(ImVec2(10, 116));
+                ImGui::SetWindowPos(ImVec2(10, 168));
                 ImGui::Text("INVALID INPUT");
             }
             ImGui::End();
@@ -221,7 +221,7 @@ int main()
         if (fileController.hasImportFailed()) {
             if (ImGui::Begin("ERROR")) {
                 ImGui::SetWindowSize(ImVec2(110, 50));
-                ImGui::SetWindowPos(ImVec2(10, 116));
+                ImGui::SetWindowPos(ImVec2(10, 168));
                 ImGui::Text("IMPORT FAILED");
             }
             ImGui::End();
