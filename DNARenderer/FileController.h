@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
-#include <DNA.h>
+#include "DNA.h"
 
 
 class FileController {

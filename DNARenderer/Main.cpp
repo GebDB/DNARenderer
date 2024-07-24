@@ -16,9 +16,9 @@
 #include "SettingsController.h"
 #include "FileController.h"
 
-#include <camera.h>
+#include "camera.h"
 
-#include <DNA.h>
+#include "DNA.h"
 
 /** CHECKLIST 
 - add controls settings
@@ -115,7 +115,7 @@ int main()
     Text = new TextRenderer(settingsController.getWindowWidth(), settingsController.getWindowHeight());
     Text->Load("assets/fonts/AovelSansRounded-rdDL.ttf", 24);
 
-    std::string seq = "ATCCGGTTGCTGGGTGAACTCCAGACTCGGGGCGACAACTC";
+    std::string seq = "";
     dna.setSequence(seq);
 
 
